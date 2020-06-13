@@ -25,15 +25,16 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        Movie movieDetails = (Movie) intent.getSerializableExtra(MovieAdapter.KEY_MOVIE);
+        Movie movieDetails = intent.getParcelableExtra(MovieAdapter.KEY_MOVIE);
 
-        assert movieDetails != null;
-        mMovieTitle.setText(movieDetails.getmMovieTitle());
-        mMovieRating.setText(String.valueOf(movieDetails.getmRating()));
-        mMovieDescription.setText(movieDetails.getmMovieDescription());
-        mReleaseDate.setText(movieDetails.getmReleaseDate());
+        if (movieDetails != null) {
+            mMovieTitle.setText(movieDetails.getmMovieTitle());
+            mMovieRating.setText(String.valueOf(movieDetails.getmRating()));
+            mMovieDescription.setText(movieDetails.getmMovieDescription());
+            mReleaseDate.setText(movieDetails.getmReleaseDate());
 
-        Picasso.get().load(movieDetails.getmImageUrl()).into(mImageView);
+            Picasso.get().load(movieDetails.getmImageUrl()).into(mImageView);
+        }
 
 
     }

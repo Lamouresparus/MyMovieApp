@@ -12,18 +12,18 @@ import java.util.Scanner;
 
 public class NetworkUtils {
 
-    private static final String BASE_URL = "https://api.themoviedb.org/3/discover/movie?api_key=";
+    private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     //You would have to input your API key. You can get this from https://developers.themoviedb.org/3
-    private static final String API_KEY = "";
+    private static final String API_KEY = "api_key=";
     private static final String LANGUAGE_PARAM = "language";
     private static final String language = "en-US";
     private static final String SORT_BY_PARAM = "sort_by";
-    public static final String POPULAR = "popularity.desc";
-    public static final String RATING = "vote_average.desc";
+    public static final String POPULAR = "popular?";
+    public static final String RATING = "top_rated?";
     private static final String TAG = "NetworkUtils";
 
     public static URL buildUrl(String sortParameter){
-        Uri builtUri = Uri.parse(BASE_URL+API_KEY)
+        Uri builtUri = Uri.parse(BASE_URL+sortParameter+API_KEY)
                 .buildUpon()
                 .appendQueryParameter(LANGUAGE_PARAM,language)
                 .appendQueryParameter(SORT_BY_PARAM, sortParameter)
