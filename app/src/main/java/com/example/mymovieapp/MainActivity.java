@@ -22,6 +22,8 @@ import com.example.mymovieapp.utils.NetworkUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private TextView mErrorMessageTv;
     private ProgressBar mProgressBar;
+     private ArrayList<Movie> movies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +64,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("StaticFieldLeak")
-    class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
+    class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<Movie>> {
 
         @Override
-        protected Movie[] doInBackground(String... strings) {
+        protected ArrayList<Movie> doInBackground(String... strings) {
 
             String param = strings[0];
 
@@ -73,10 +76,10 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String jsonMovieResponse = NetworkUtils.httpUrlConnection(movieRequest);
 
-                Movie[] movies = MovieJson.getMoviesFromJson(jsonMovieResponse);
+               movies = MovieJson.getMoviesFromJson(jsonMovieResponse);
 
                 assert movies != null;
-                Log.v(TAG, movies[3].getmMovieDescription());
+                Log.v(TAG, movies.get(3).getmMovieDescription());
 
                 return movies;
 
@@ -95,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Movie[] movies) {
+        protected void onPostExecute(ArrayList<Movie> movies) {
             super.onPostExecute(movies);
             mProgressBar.setVisibility(View.INVISIBLE);
             if (movies != null) {

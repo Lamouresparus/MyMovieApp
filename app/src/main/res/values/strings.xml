@@ -5,4 +5,7 @@
     <string name="sort_by">Sort By</string>
     <string name="most_popular">Most Popular</string>
     <string name="rating">Rating</string>
+    <string name="movie_trailers">Movie Trailers</string>
+    <string name="mark_as_favourite">Mark As Favourite</string>
+    <string name="movietrailer_name_is">movietrailer name is</string>
 </resources>

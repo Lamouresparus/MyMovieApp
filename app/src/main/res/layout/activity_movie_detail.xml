@@ -6,22 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".MovieDetailActivity"
     android:background="@color/colorPrimaryDark">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".DetailActivity"
-        android:background="@color/colorPrimaryDark">
+        android:background="@color/colorPrimaryDark"
+        tools:context=".DetailActivity">
+
         <ImageView
             android:id="@+id/movie_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:contentDescription="@string/movie_poster"
             android:scaleType="fitXY"
+            android:src="@mipmap/ic_launcher"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/colorPrimaryDark"
-            android:contentDescription="@string/movie_poster" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/movie_title"
@@ -31,52 +34,96 @@
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingRight="16dp"
+            android:textColor="@android:color/white"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/movie_image"
-            android:textColor="@android:color/white"
-            android:paddingRight="16dp"
-            android:paddingEnd="16dp"
-            tools:ignore="RtlSymmetry" />
+            app:layout_constraintTop_toBottomOf="@+id/favourites_tv"
+            tools:ignore="RtlSymmetry"
+            tools:text="Happy Home" />
 
         <TextView
             android:id="@+id/movie_rating"
+            style="@style/detail_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/detail_margin"
-            android:textColor="@color/colorAccent"
+            android:drawableEnd="@drawable/ic_star_gold_24dp"
+            android:drawableRight="@drawable/ic_star_gold_24dp"
+            android:drawablePadding="4dp"
+            android:textColor="@color/colorPrimaryLight"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/movie_title"
-            android:textStyle="bold"
-            android:drawableEnd="@drawable/ic_star_black_24dp"
-            android:drawablePadding="4dp"
-            android:drawableRight="@drawable/ic_star_black_24dp" />
+            tools:text="8.9" />
 
         <TextView
             android:id="@+id/movie_release_date"
+            style="@style/detail_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/detail_margin"
+            android:textColor="@android:color/white"
             app:layout_constraintStart_toEndOf="@+id/movie_rating"
             app:layout_constraintTop_toBottomOf="@+id/movie_title"
-            android:textColor="@android:color/white"/>
+            tools:text="19 april 2020" />
 
+        <TextView
+            android:id="@+id/favourites_tv"
+            style="@style/detail_margin"
+            android:layout_width="125dp"
+            android:layout_height="23dp"
+            android:gravity="center"
+            android:text="@string/mark_as_favourite"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/movie_image" />
 
 
         <TextView
             android:id="@+id/movie_description"
+            style="@style/detail_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:paddingLeft="8dp"
+            android:paddingEnd="4dp"
+            android:paddingRight="4dp"
             android:textColor="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/movie_release_date"
+            tools:text="vgvfgvhgdfhgj gdyy hfjhh hfhjh hjhf jhf dsjhjhj feuhjf fghbe hfhb fhhvf fehhf hh
+sge fhhff jfhfhfhu efjhruhhu fejhjh efjhjhjeuyhhjujhhfgnh gffghhjghfdgftugnvbvc xcfvg6ytttyvnbbvffcnnhhhn  b nbghtfhhhtfdfgbnh nnnjjhhhfyh hggffhhjjyyuaswwwwwwwwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwww ww1za2wwwwwwwwsedds3saaazz aq5c6v qqywwwwwwwwwsssaassq jehf" />
+
+        <TextView
+            android:id="@+id/movie_trailer_tv"
             style="@style/detail_margin"
-            android:paddingRight="4dp"
-            android:paddingLeft="8dp"
-            android:paddingEnd="4dp"
-            android:paddingStart="8dp" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/movie_trailers"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/trailer_scroll_view"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/movie_description"/>
+
+        <ScrollView
+            android:id="@+id/trailer_scroll_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/movie_description"
+            tools:ignore="NestedScrolling">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/rv_movie_trailer"/>
+
+        </ScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

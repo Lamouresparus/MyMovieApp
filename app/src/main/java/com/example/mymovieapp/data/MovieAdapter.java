@@ -15,12 +15,15 @@ import com.example.mymovieapp.MovieDetailActivity;
 import com.example.mymovieapp.R;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
     public MovieAdapter(){}
 
     public static final String KEY_MOVIE = "movie";
 
-    private Movie[] mMovie;
+    private ArrayList<Movie> mMovie;
 
     @NonNull
     @Override
@@ -36,7 +39,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        final Movie movie = mMovie[position];
+        final Movie movie = mMovie.get(position);
 
         holder.bind(movie);
 
@@ -59,7 +62,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         if (mMovie == null) {
             return 0;
         } else {
-            return mMovie.length;
+            return mMovie.size();
         }
     }
 
@@ -81,7 +84,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         }
     }
 
-    public void setMovieData(Movie[] movies) {
+    public void setMovieData(ArrayList<Movie> movies) {
         mMovie = movies;
         notifyDataSetChanged();
     }
