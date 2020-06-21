@@ -90,7 +90,6 @@
             android:paddingEnd="4dp"
             android:paddingRight="4dp"
             android:textColor="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/movie_release_date"
@@ -102,28 +101,45 @@ sge fhhff jfhfhfhu efjhruhhu fejhjh efjhjhjeuyhhjujhhfgnh gffghhjghfdgftugnvbvc 
             style="@style/detail_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:gravity="center"
             android:text="@string/movie_trailers"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/trailer_scroll_view"
+            app:layout_constraintBottom_toTopOf="@+id/rv_movie_trailer"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/movie_description"/>
+            app:layout_constraintTop_toBottomOf="@+id/movie_description" />
 
-        <ScrollView
-            android:id="@+id/trailer_scroll_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_movie_trailer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/movie_description"
-            tools:ignore="NestedScrolling">
+            app:layout_constraintTop_toBottomOf="@+id/movie_trailer_tv" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/rv_movie_trailer"/>
+        <TextView
+            android:id="@+id/movie_reviews_tv"
+            style="@style/detail_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/reviews"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/rv_movie_reviews"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rv_movie_trailer" />
 
-        </ScrollView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_movie_reviews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/movie_reviews_tv" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

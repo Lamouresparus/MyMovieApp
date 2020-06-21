@@ -14,6 +14,7 @@ public class NetworkUtils {
 
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     //You would have to input your API key. You can get this from https://developers.themoviedb.org/3
+    //https://api.themoviedb.org/3/movie/89/reviews?api_key=7c1c55880ff452766b16a27fec251f41&language=en-US&page=1
     private static final String API_KEY = "api_key=7c1c55880ff452766b16a27fec251f41";
     private static final String LANGUAGE_PARAM = "language";
     private static final String language = "en-US";
@@ -21,7 +22,10 @@ public class NetworkUtils {
     public static final String POPULAR = "popular?";
     public static final String RATING = "top_rated?";
     private static final String TAG = "NetworkUtils";
-    public static final String VIDEOS = "/videos?";
+    private static final String VIDEOS = "/videos?";
+    private static final String REVIEWS = "/reviews?";
+    private static final String NO_OF_PAGE_PARAM = "page";
+    private static final String ONE_PAGE = "1";
 
     public static URL buildUrl(String sortParameter){
         Uri builtUri = Uri.parse(BASE_URL+sortParameter+API_KEY)
@@ -53,6 +57,22 @@ public class NetworkUtils {
         }
 
         Log.v(TAG,"Url formed for movie trailer is" + url);
+
+        return url;
+    }
+
+    public static URL buildMovieReview(String movieId){
+        Uri builtUri = Uri.parse(BASE_URL+movieId+REVIEWS+API_KEY).buildUpon().
+                appendQueryParameter(LANGUAGE_PARAM,language).appendQueryParameter(NO_OF_PAGE_PARAM,ONE_PAGE).build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        Log.v(TAG,"Url formed for movie review is" + url);
 
         return url;
     }

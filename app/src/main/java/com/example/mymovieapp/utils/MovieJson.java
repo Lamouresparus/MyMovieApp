@@ -3,6 +3,7 @@ package com.example.mymovieapp.utils;
 import android.util.Log;
 
 import com.example.mymovieapp.data.Movie;
+import com.example.mymovieapp.data.MovieReview;
 import com.example.mymovieapp.data.MovieTrailer;
 
 import org.json.JSONArray;
@@ -24,11 +25,13 @@ public class MovieJson {
     private static final String RATING = "vote_average";
     private static final String RELEASE_DATE = "release_date";
     private static final String IMAGE_URL = "poster_path";
-    public static final String ID = "id";
-    public static final String NAME = "name";
-    public static final String KEY = "key";
+    private static final String ID = "id";
+    private static final String NAME = "name";
+    private static final String KEY = "key";
+    private static final String AUTHOR = "author";
+    public static final String REVIEW = "content";
     private static final String BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500/";
-    public static final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
+    private static final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
 
 
     public static ArrayList<Movie> getMoviesFromJson(String jsonString) {
@@ -103,5 +106,32 @@ public class MovieJson {
 
         return null;
 
+    }
+
+    public static ArrayList<MovieReview> getReviews(String jsonMovieReview){
+        try {
+            JSONObject object = new JSONObject(jsonMovieReview);
+
+            JSONArray results = object.getJSONArray(RESULT);
+            ArrayList<MovieReview> movieReviews = new ArrayList<>();
+
+
+            for (int i=0; i<results.length(); i++) {
+                JSONObject reviewObject = results.getJSONObject(i);
+                String author = reviewObject.getString(AUTHOR);
+                String review = reviewObject.getString(REVIEW);
+
+                MovieReview movieReview = new MovieReview(author,review);
+
+                movieReviews.add(i, movieReview);
+            }
+
+            return movieReviews;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
