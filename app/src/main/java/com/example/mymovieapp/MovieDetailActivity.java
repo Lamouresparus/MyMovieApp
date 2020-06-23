@@ -10,10 +10,11 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.mymovieapp.data.AppDatabase;
 import com.example.mymovieapp.data.Movie;
 import com.example.mymovieapp.data.MovieAdapter;
 import com.example.mymovieapp.data.MovieReview;
@@ -21,8 +22,10 @@ import com.example.mymovieapp.data.MovieReviewAdapter;
 import com.example.mymovieapp.data.MovieTrailer;
 import com.example.mymovieapp.data.MovieTrailerAdapter;
 import com.example.mymovieapp.data.MovieTrailerAndReviews;
+import com.example.mymovieapp.utils.AppExecutors;
 import com.example.mymovieapp.utils.MovieJson;
 import com.example.mymovieapp.utils.NetworkUtils;
+import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -41,6 +44,10 @@ public class MovieDetailActivity extends AppCompatActivity {
     private RecyclerView movieReviewRv;
     private TextView mMovieTrailerTv;
     private TextView mMovieReviewTv;
+    private MaterialFavoriteButton favoriteButton;
+    private AppDatabase mDb;
+
+    Movie mMovieDetails;
 
     String movieId;
 
@@ -59,22 +66,24 @@ public class MovieDetailActivity extends AppCompatActivity {
         TextView mMovieRating = findViewById(R.id.movie_rating);
         mMovieTrailerTv = findViewById(R.id.movie_trailer_tv);
         mMovieReviewTv = findViewById(R.id.movie_reviews_tv);
+        favoriteButton = findViewById(R.id.favourites_button);
+        mDb = AppDatabase.getInstance(this);
 
         Intent intent = getIntent();
 
-        Movie movieDetails = intent.getParcelableExtra(MovieAdapter.KEY_MOVIE);
+        mMovieDetails = intent.getParcelableExtra(MovieAdapter.KEY_MOVIE);
 
-        if (movieDetails != null) {
+        if (mMovieDetails != null) {
 
-            Objects.requireNonNull(getSupportActionBar()).setTitle(movieDetails.getmMovieTitle());
+            Objects.requireNonNull(getSupportActionBar()).setTitle(mMovieDetails.getmMovieTitle());
 
-            movieId = String.valueOf(movieDetails.getmMovieId());
-            mMovieTitle.setText(movieDetails.getmMovieTitle());
-            mMovieRating.setText(String.valueOf(movieDetails.getmRating()));
-            mMovieDescription.setText(movieDetails.getmMovieDescription());
-            mReleaseDate.setText(movieDetails.getmReleaseDate());
+            movieId = String.valueOf(mMovieDetails.getmMovieId());
+            mMovieTitle.setText(mMovieDetails.getmMovieTitle());
+            mMovieRating.setText(String.valueOf(mMovieDetails.getmRating()));
+            mMovieDescription.setText(mMovieDetails.getmMovieDescription());
+            mReleaseDate.setText(mMovieDetails.getmReleaseDate());
 
-            Picasso.get().load(movieDetails.getmImageUrl()).into(mImageView);
+            Picasso.get().load(mMovieDetails.getmImageUrl()).into(mImageView);
 
         }
 
@@ -97,8 +106,11 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         seeMovieTrailerAndReview();
 
+        checkIfFavourite();
+
 
     }
+
 
     public void seeMovieTrailerAndReview() {
 
@@ -123,9 +135,6 @@ public class MovieDetailActivity extends AppCompatActivity {
                     movieTrailers = MovieJson.getTrailerDetails(jsonMovieTrailerResponse);
                     movieReviews = MovieJson.getReviews(jsonMovieReviewResponse);
 
-                    //Log.v(TAG, "Trailer Url is "+movieTrailers.get(0).getTrailerStringUrl());
-                  //  Log.v(TAG, "Review is "+movieReviews.get(0).getReviewContent());
-
 
                     return new MovieTrailerAndReviews(movieTrailers,movieReviews);
 
@@ -139,16 +148,15 @@ public class MovieDetailActivity extends AppCompatActivity {
         protected void onPostExecute(MovieTrailerAndReviews movieTrailerAndReviews) {
             super.onPostExecute(movieTrailerAndReviews);
             if (movieTrailerAndReviews != null) {
-                Log.v(TAG, "Trailer Uri for is "+movieTrailerAndReviews.getmMovieTrailers().get(0).getTrailerStringUrl());
 
                 movieTrailers = movieTrailerAndReviews.getmMovieTrailers();
                 movieReviews = movieTrailerAndReviews.getmMovieReviews();
-                if(movieTrailers != null){
+                if(movieTrailers != null && movieTrailers.size() != 0){
                     mMovieTrailerAdapter.setMovieTrailerData(movieTrailers);
                 }
                 else showMovieTrailerErrorMessage();
 
-                if(movieReviews != null){
+                if(movieReviews != null && movieReviews.size() != 0){
                     movieReviewAdapter.setMovieTrailerData(movieReviews);
                 }
                 else showMovieReviewErrorMessage();
@@ -170,4 +178,55 @@ public class MovieDetailActivity extends AppCompatActivity {
     private void showMovieReviewErrorMessage() {
         mMovieReviewTv.setText(R.string.no_movie_review);
     }
+
+    private void checkIfFavourite(){
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                if(mDb.favouriteDao().loadMovieById(mMovieDetails.getmMovieId()) !=null){
+                    favoriteButton.setFavorite(true);
+                };
+
+            }
+        });
+
+        favouriteButtonOnChange();
+    }
+
+    private void favouriteButtonOnChange(){
+        favoriteButton.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
+            @Override
+            public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+                if(favorite){
+                    saveFavourites(mMovieDetails);
+                    Toast toast =Toast.makeText(getApplicationContext(),"added to favourites",Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else {
+                    deleteFavourite(mMovieDetails);
+                    Toast toast =Toast.makeText(getApplicationContext(),"removed from favourites",Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+        });
+    }
+
+    private void deleteFavourite(final Movie movie) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.favouriteDao().deleteFavourite(movie);
+            }
+        });
+    }
+
+    private void saveFavourites(final Movie movie) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.favouriteDao().insertFavouriteMovie(movie);
+            }
+        });
+    }
+
 }

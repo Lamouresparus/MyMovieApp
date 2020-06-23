@@ -3,7 +3,12 @@ package com.example.mymovieapp.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "movie")
 public class Movie implements Parcelable {
+    @PrimaryKey
     private final int mMovieId;
     private  final String mImageUrl;
     private final String mMovieTitle;

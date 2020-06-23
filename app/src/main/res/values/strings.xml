@@ -11,4 +11,5 @@
     <string name="reviews">Reviews</string>
     <string name="no_movie_trailers">No Movie Trailers</string>
     <string name="no_movie_review">No Reviews</string>
+    <string name="favourite">Favourite</string>
 </resources>

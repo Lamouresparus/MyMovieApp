@@ -39,7 +39,7 @@
             android:textColor="@android:color/white"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/favourites_tv"
+            app:layout_constraintTop_toBottomOf="@+id/favourites_button"
             tools:ignore="RtlSymmetry"
             tools:text="Happy Home" />
 
@@ -67,18 +67,14 @@
             app:layout_constraintTop_toBottomOf="@+id/movie_title"
             tools:text="19 april 2020" />
 
-        <TextView
-            android:id="@+id/favourites_tv"
-            style="@style/detail_margin"
-            android:layout_width="125dp"
-            android:layout_height="23dp"
-            android:gravity="center"
-            android:text="@string/mark_as_favourite"
-            android:textColor="@color/colorAccent"
-            android:textStyle="bold"
+        <com.github.ivbaranov.mfb.MaterialFavoriteButton
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:mfb_favorite_image="@drawable/ic_favorite_24dp"
+            android:id="@+id/favourites_button"
+            android:background="@color/colorAccent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/movie_image" />
-
+            app:layout_constraintTop_toBottomOf="@+id/movie_image"/>
 
         <TextView
             android:id="@+id/movie_description"

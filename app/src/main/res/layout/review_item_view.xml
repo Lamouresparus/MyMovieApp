@@ -10,7 +10,11 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        style="@style/detail_margin"/>
+        style="@style/detail_margin"
+        android:paddingBottom="4dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        />
 
     <TextView
         android:id="@+id/review_body"
@@ -18,7 +22,8 @@
         android:layout_height="wrap_content"
         style="@style/detail_margin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/reviewer"/>
+        app:layout_constraintTop_toTopOf="@id/reviewer"
+        android:textColor="@android:color/white"/>
 
 
 
