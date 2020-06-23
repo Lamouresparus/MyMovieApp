@@ -76,7 +76,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         }
 
         private void bind(Movie movie) {
-            String imageUrl = movie.getmImageUrl();
+            String imageUrl = movie.getMImageUrl();
 
             Log.v("IMAGE_URL", imageUrl);
             Picasso.get().load(imageUrl).into(mImageView);

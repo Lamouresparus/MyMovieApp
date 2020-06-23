@@ -16,6 +16,8 @@ public class Movie implements Parcelable {
     private final String mReleaseDate;
     private final double mRating;
 
+
+
     public Movie(int mMovieId, String mImageUrl, String movieTitle, String movieDescription, String releaseDate, double rating) {
         this.mImageUrl = mImageUrl;
         this.mMovieTitle = movieTitle;
@@ -26,27 +28,28 @@ public class Movie implements Parcelable {
     }
 
 
-    public String getmImageUrl() {
+
+    public String getMImageUrl() {
         return mImageUrl;
     }
 
-    public String getmMovieTitle() {
+    public String getMMovieTitle() {
         return mMovieTitle;
     }
 
-    public String getmMovieDescription() {
+    public String getMMovieDescription() {
         return mMovieDescription;
     }
 
-    public String getmReleaseDate() {
+    public String getMReleaseDate() {
         return mReleaseDate;
     }
 
-    public double getmRating() {
+    public double getMRating() {
         return mRating;
     }
 
-    public int getmMovieId() {
+    public int getMMovieId() {
         return mMovieId;
     }
 

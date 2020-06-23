@@ -8,14 +8,17 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import static android.icu.text.MessagePattern.ArgType.SELECT;
 
 @Dao
 public interface FavouriteDao {
 
+    /**
+     * @return
+     */
     @Query("SELECT * FROM movie")
-    LiveData<ArrayList<Movie>> loadAllFavourites();
+    LiveData<List<Movie>> loadAllFavourites();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertFavouriteMovie(Movie movie);
@@ -27,5 +30,5 @@ public interface FavouriteDao {
     LiveData<Movie> loadMovieById (int movieId);
 
     @Query("DELETE FROM movie WHERE mMovieId = :movieId")
-    LiveData<Movie> removeFromFavourite(int movieId);
+    void removeFromFavourite(int movieId);
 }

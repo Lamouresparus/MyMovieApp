@@ -10,9 +10,10 @@ import com.example.mymovieapp.data.AppDatabase;
 import com.example.mymovieapp.data.Movie;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {
-    private LiveData<ArrayList<Movie>> favouriteMovies;
+    private LiveData<List<Movie>> favouriteMovies;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
@@ -20,7 +21,7 @@ public class MainViewModel extends AndroidViewModel {
         favouriteMovies = appDatabase.favouriteDao().loadAllFavourites();
     }
 
-    public LiveData<ArrayList<Movie>> getFavouriteMovies() {
+    public LiveData<List<Movie>> getFavouriteMovies() {
         return favouriteMovies;
     }
 }

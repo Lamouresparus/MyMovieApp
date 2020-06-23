@@ -23,7 +23,6 @@ import com.example.mymovieapp.utils.NetworkUtils;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected ArrayList<Movie> doInBackground(String... strings) {
 
+            Log.v(TAG, "Movie do in back");
+
             String param = strings[0];
 
             URL movieRequest = NetworkUtils.buildUrl(param);
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                movies = MovieJson.getMoviesFromJson(jsonMovieResponse);
 
                 assert movies != null;
-                Log.v(TAG, movies.get(3).getmMovieDescription());
+                Log.v(TAG, movies.get(3).getMMovieDescription());
 
                 return movies;
 

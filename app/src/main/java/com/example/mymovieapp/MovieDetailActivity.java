@@ -75,15 +75,15 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         if (mMovieDetails != null) {
 
-            Objects.requireNonNull(getSupportActionBar()).setTitle(mMovieDetails.getmMovieTitle());
+            Objects.requireNonNull(getSupportActionBar()).setTitle(mMovieDetails.getMMovieTitle());
 
-            movieId = String.valueOf(mMovieDetails.getmMovieId());
-            mMovieTitle.setText(mMovieDetails.getmMovieTitle());
-            mMovieRating.setText(String.valueOf(mMovieDetails.getmRating()));
-            mMovieDescription.setText(mMovieDetails.getmMovieDescription());
-            mReleaseDate.setText(mMovieDetails.getmReleaseDate());
+            movieId = String.valueOf(mMovieDetails.getMMovieId());
+            mMovieTitle.setText(mMovieDetails.getMMovieTitle());
+            mMovieRating.setText(String.valueOf(mMovieDetails.getMRating()));
+            mMovieDescription.setText(mMovieDetails.getMMovieDescription());
+            mReleaseDate.setText(mMovieDetails.getMReleaseDate());
 
-            Picasso.get().load(mMovieDetails.getmImageUrl()).into(mImageView);
+            Picasso.get().load(mMovieDetails.getMImageUrl()).into(mImageView);
 
         }
 
@@ -183,7 +183,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                if(mDb.favouriteDao().loadMovieById(mMovieDetails.getmMovieId()) !=null){
+                if(mDb.favouriteDao().loadMovieById(mMovieDetails.getMMovieId()) !=null){
                     favoriteButton.setFavorite(true);
                 };
 
