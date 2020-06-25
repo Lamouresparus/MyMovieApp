@@ -10,10 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MovieJson {
 
@@ -29,7 +26,7 @@ public class MovieJson {
     private static final String NAME = "name";
     private static final String KEY = "key";
     private static final String AUTHOR = "author";
-    public static final String REVIEW = "content";
+    private static final String REVIEW = "content";
     private static final String BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500/";
     private static final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
 

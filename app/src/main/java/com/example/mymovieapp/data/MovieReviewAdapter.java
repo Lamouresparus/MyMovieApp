@@ -16,8 +16,6 @@ import java.util.ArrayList;
 
 public class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewAdapter.ViewHolder> {
 
-    private static final String TAG = "MovieReviewAdapter";
-
     private ArrayList<MovieReview> mMovieReviews;
 
     @NonNull
@@ -48,7 +46,7 @@ public class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewAdapter.
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         final TextView reviewAuthorTv;
         final TextView reviewTv;
 

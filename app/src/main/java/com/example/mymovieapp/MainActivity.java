@@ -1,11 +1,16 @@
 package com.example.mymovieapp;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -15,14 +20,18 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.mymovieapp.data.AppDatabase;
 import com.example.mymovieapp.data.Movie;
 import com.example.mymovieapp.data.MovieAdapter;
 import com.example.mymovieapp.utils.MovieJson;
 import com.example.mymovieapp.utils.NetworkUtils;
+import com.example.mymovieapp.view_model.MainViewModel;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private TextView mErrorMessageTv;
     private ProgressBar mProgressBar;
-     private ArrayList<Movie> movies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String jsonMovieResponse = NetworkUtils.httpUrlConnection(movieRequest);
 
-               movies = MovieJson.getMoviesFromJson(jsonMovieResponse);
+                ArrayList<Movie> movies = MovieJson.getMoviesFromJson(jsonMovieResponse);
 
                 assert movies != null;
                 Log.v(TAG, movies.get(3).getMMovieDescription());
@@ -127,6 +135,28 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void loadFavourites(){
+        showMovieCatalog();
+        MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mainViewModel.getFavouriteMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(List<Movie> movies) {
+                ArrayList<Movie> movieArrayList = (ArrayList<Movie>) movies;
+
+                if (movieArrayList != null && movieArrayList.size()!=0) {
+                    mMovieAdapter.setMovieData(movieArrayList);
+                }
+                else showFavouriteErrorMessage();
+            }
+        });
+    }
+
+    private void showFavouriteErrorMessage() {
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        mErrorMessageTv.setText(R.string.no_favourite_added);
+        mErrorMessageTv.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -134,22 +164,30 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.sort_by_rating) {
-
+            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.rating);
             mMovieAdapter.setMovieData(null);
 
             loadMovieData(NetworkUtils.RATING);
             return true;
         }
         if (itemId == R.id.sort_by_popular) {
+            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.most_popular);
 
             mMovieAdapter.setMovieData(null);
 
             loadMovieData(NetworkUtils.POPULAR);
             return true;
+        }
+        if(itemId == R.id.sort_by_favourites){
+            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.favorites);
+
+            mMovieAdapter.setMovieData(null);
+            loadFavourites();
         }
         return super.onOptionsItemSelected(item);
 

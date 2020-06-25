@@ -21,7 +21,7 @@ public class MovieTrailerAdapter extends RecyclerView.Adapter<MovieTrailerAdapte
     private static final String TAG = "MovieTrailerAdapter";
 
     private ArrayList<MovieTrailer> mMovieTrailers;
-    private Context mContext;
+    private final Context mContext;
     public MovieTrailerAdapter(Context context){
         mContext =context;
     }
@@ -67,7 +67,7 @@ public class MovieTrailerAdapter extends RecyclerView.Adapter<MovieTrailerAdapte
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         final TextView mTextView;
 
         ViewHolder(@NonNull View itemView) {

@@ -2,14 +2,17 @@ package com.example.mymovieapp;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,16 +43,14 @@ public class MovieDetailActivity extends AppCompatActivity {
     private ArrayList<MovieReview> movieReviews;
     private MovieTrailerAdapter mMovieTrailerAdapter;
     private MovieReviewAdapter movieReviewAdapter;
-    private RecyclerView movieTrailerRv;
-    private RecyclerView movieReviewRv;
     private TextView mMovieTrailerTv;
     private TextView mMovieReviewTv;
     private MaterialFavoriteButton favoriteButton;
     private AppDatabase mDb;
+    private  SharedPreferences sharedPref;
+    private Movie mMovieDetails;
 
-    Movie mMovieDetails;
-
-    String movieId;
+    private String movieId;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -57,8 +58,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
-        movieTrailerRv = findViewById(R.id.rv_movie_trailer);
-        movieReviewRv = findViewById(R.id.rv_movie_reviews);
+        RecyclerView movieTrailerRv = findViewById(R.id.rv_movie_trailer);
+        RecyclerView movieReviewRv = findViewById(R.id.rv_movie_reviews);
         ImageView mImageView = findViewById(R.id.movie_image);
         TextView mMovieDescription = findViewById(R.id.movie_description);
         TextView mMovieTitle = findViewById(R.id.movie_title);
@@ -68,6 +69,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         mMovieReviewTv = findViewById(R.id.movie_reviews_tv);
         favoriteButton = findViewById(R.id.favourites_button);
         mDb = AppDatabase.getInstance(this);
+
 
         Intent intent = getIntent();
 
@@ -103,6 +105,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         movieTrailerRv.setAdapter(mMovieTrailerAdapter);
         movieReviewRv.setAdapter(movieReviewAdapter);
 
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
         seeMovieTrailerAndReview();
 
@@ -112,13 +115,13 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
 
-    public void seeMovieTrailerAndReview() {
+    private void seeMovieTrailerAndReview() {
 
         new FetchMovieTrailer().execute(movieId);
     }
 
     @SuppressLint("StaticFieldLeak")
-    public class FetchMovieTrailer extends AsyncTask<String, Void, MovieTrailerAndReviews>{
+    class FetchMovieTrailer extends AsyncTask<String, Void, MovieTrailerAndReviews>{
 
         @Override
         protected MovieTrailerAndReviews doInBackground(String... strings) {
@@ -180,15 +183,13 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     private void checkIfFavourite(){
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                if(mDb.favouriteDao().loadMovieById(mMovieDetails.getMMovieId()) !=null){
-                    favoriteButton.setFavorite(true);
-                };
-
-            }
-        });
+        boolean isFavourite = sharedPref.getBoolean(movieId, false);
+        if(isFavourite){
+            favoriteButton.setFavorite(true);
+        }
+        else {
+            favoriteButton.setFavorite(false);
+        }
 
         favouriteButtonOnChange();
     }
@@ -198,14 +199,33 @@ public class MovieDetailActivity extends AppCompatActivity {
             @Override
             public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
                 if(favorite){
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putBoolean(movieId, true);
+                    editor.apply();
                     saveFavourites(mMovieDetails);
-                    Toast toast =Toast.makeText(getApplicationContext(),"added to favourites",Toast.LENGTH_SHORT);
-                    toast.show();
+                    MovieDetailActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast toast =Toast.makeText(getApplicationContext(),"added to favourites",Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    });
+
                 }
                 else {
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putBoolean(movieId,false);
+                    editor.apply();
+                    Log.v(TAG,"Favourite removed is "+ sharedPref.getBoolean(movieId,false));
                     deleteFavourite(mMovieDetails);
-                    Toast toast =Toast.makeText(getApplicationContext(),"removed from favourites",Toast.LENGTH_SHORT);
-                    toast.show();
+                    MovieDetailActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast toast =Toast.makeText(getApplicationContext(),"removed from favourites",Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    });
+
                 }
             }
         });
@@ -215,6 +235,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
+                Log.v(TAG, "removing from database");
                 mDb.favouriteDao().deleteFavourite(movie);
             }
         });
@@ -224,6 +245,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
+                Log.v(TAG, "adding to database");
                 mDb.favouriteDao().insertFavouriteMovie(movie);
             }
         });

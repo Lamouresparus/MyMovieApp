@@ -16,15 +16,5 @@ android:background="@color/colorPrimaryDark">
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <TextView
-        android:id="@+id/favourites_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_favorite_24dp"
-        android:drawableLeft="@drawable/ic_favorite_24dp"
-        app:layout_constraintEnd_toEndOf="@+id/movie_image_view"
-        app:layout_constraintTop_toTopOf="@+id/movie_image_view"
-        android:textColor="@android:color/white"/>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
