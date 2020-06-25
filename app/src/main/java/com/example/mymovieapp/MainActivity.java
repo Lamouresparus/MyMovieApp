@@ -9,6 +9,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,8 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.example.mymovieapp.data.AppDatabase;
 import com.example.mymovieapp.data.Movie;
 import com.example.mymovieapp.data.MovieAdapter;
 import com.example.mymovieapp.utils.MovieJson;
@@ -42,6 +46,16 @@ public class MainActivity extends AppCompatActivity {
     private TextView mErrorMessageTv;
     private ProgressBar mProgressBar;
 
+    /**
+     * if sortingCategory 1 : popular and rating
+     * else if 0 : loadFavourite
+     */
+    private int sortingCategory = 1;
+    private MainViewModel mainViewModel;
+    private boolean networkIsAvailable;
+    private InternetBroadcastReceiver mInternetBroadcastReciever;
+    private IntentFilter mInternetIntenFilter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +63,13 @@ public class MainActivity extends AppCompatActivity {
         mErrorMessageTv = findViewById(R.id.error_message_tv);
         mRecyclerView = findViewById(R.id.rv_movie_catalog);
         mProgressBar = findViewById(R.id.progress_bar);
+
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+
+        mInternetIntenFilter = new IntentFilter();
+        mInternetBroadcastReciever = new InternetBroadcastReceiver();
+
+        mInternetIntenFilter.addAction(Intent.ACTION_MANAGE_NETWORK_USAGE);
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2, RecyclerView.VERTICAL, false);
 
@@ -64,10 +85,25 @@ public class MainActivity extends AppCompatActivity {
 
         //default movie catalog will be in sort order of popular
         loadMovieData(NetworkUtils.POPULAR);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mInternetBroadcastReciever,mInternetIntenFilter);
+        if(!networkIsAvailable){
+            mErrorMessageTv.setText(R.string.no_internet_connection);
+            showErrorMessage();
+        }
+        else {
+            mErrorMessageTv.setText(R.string.error_message);
+        }
+    }
 
-
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mInternetBroadcastReciever);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -75,8 +111,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected ArrayList<Movie> doInBackground(String... strings) {
-
-            Log.v(TAG, "Movie do in back");
 
             String param = strings[0];
 
@@ -109,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<Movie> movies) {
             super.onPostExecute(movies);
-            mProgressBar.setVisibility(View.INVISIBLE);
+            mProgressBar.setVisibility(View.GONE);
+            mErrorMessageTv.setVisibility(View.GONE);
             if (movies != null) {
                 mMovieAdapter.setMovieData(movies);
             }
@@ -118,14 +153,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadMovieData(String sort) {
+            showMovieCatalog();
+            new FetchMoviesTask().execute(sort);
+        }
 
-        showMovieCatalog();
-
-        new FetchMoviesTask().execute(sort);
-    }
 
     private void showMovieCatalog() {
-        mErrorMessageTv.setVisibility(View.INVISIBLE);
+        mErrorMessageTv.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
@@ -137,10 +171,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadFavourites(){
         showMovieCatalog();
-        MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         mainViewModel.getFavouriteMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(List<Movie> movies) {
+                if(sortingCategory != 0) return;
+
                 ArrayList<Movie> movieArrayList = (ArrayList<Movie>) movies;
 
                 if (movieArrayList != null && movieArrayList.size()!=0) {
@@ -169,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.sort_by_rating) {
+            sortingCategory = 1;
             Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.rating);
             mMovieAdapter.setMovieData(null);
 
@@ -176,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (itemId == R.id.sort_by_popular) {
+            sortingCategory =1;
             Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.most_popular);
 
             mMovieAdapter.setMovieData(null);
@@ -184,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if(itemId == R.id.sort_by_favourites){
+            sortingCategory = 0;
             Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.favorites);
 
             mMovieAdapter.setMovieData(null);
@@ -191,5 +229,28 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
 
+    }
+
+    private class InternetBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            if (connectivityManager != null) {
+                NetworkInfo wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                NetworkInfo mobileData = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+                if (mobileData != null && wifi!=null) {
+                   if ((wifi.isAvailable() || mobileData.isAvailable())){
+                       networkIsAvailable=true;
+                    }
+                }
+                else {
+                    networkIsAvailable = false;
+                }
+            }
+        }
     }
 }

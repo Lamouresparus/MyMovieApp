@@ -14,16 +14,21 @@ import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {
     private static final String TAG = "MainViewModel";
-    private final LiveData<List<Movie>> favouriteMovies;
+    private LiveData<List<Movie>> favouriteMovies;
+    private final AppDatabase appDatabase;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
-        AppDatabase appDatabase = AppDatabase.getInstance(application.getApplicationContext());
+        appDatabase = AppDatabase.getInstance(application.getApplicationContext());
         Log.d(TAG, "Actively retrieving the tasks from the DataBase");
-        favouriteMovies = appDatabase.favouriteDao().loadAllFavourites();
+        fetchFavouritesFromDb();
     }
 
     public LiveData<List<Movie>> getFavouriteMovies() {
         return favouriteMovies;
+    }
+
+    private void fetchFavouritesFromDb(){
+        favouriteMovies = appDatabase.favouriteDao().loadAllFavourites();
     }
 }

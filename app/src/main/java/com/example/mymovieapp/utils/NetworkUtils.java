@@ -14,7 +14,6 @@ public class NetworkUtils {
 
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     //You would have to input your API key. You can get this from https://developers.themoviedb.org/3
-    //https://api.themoviedb.org/3/movie/89/reviews?api_key=7c1c55880ff452766b16a27fec251f41&language=en-US&page=1
     private static final String API_KEY = "api_key=";
     private static final String LANGUAGE_PARAM = "language";
     private static final String language = "en-US";
