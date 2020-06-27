@@ -1,13 +1,5 @@
 package com.example.mymovieapp;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,11 +17,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.mymovieapp.data.Movie;
 import com.example.mymovieapp.data.MovieAdapter;
 import com.example.mymovieapp.utils.MovieJson;
 import com.example.mymovieapp.utils.NetworkUtils;
 import com.example.mymovieapp.view_model.MainViewModel;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URL;
@@ -53,9 +55,12 @@ public class MainActivity extends AppCompatActivity {
     private int sortingCategory = 1;
     private MainViewModel mainViewModel;
     private boolean networkIsAvailable;
-    private InternetBroadcastReceiver mInternetBroadcastReciever;
-    private IntentFilter mInternetIntenFilter;
+    private InternetBroadcastReceiver mInternetBroadcastReceiver;
+    private IntentFilter mInternetIntentFilter;
+    private String sort;
+    private static final String SORT_KEY = "sort key";
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,10 +71,10 @@ public class MainActivity extends AppCompatActivity {
 
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
-        mInternetIntenFilter = new IntentFilter();
-        mInternetBroadcastReciever = new InternetBroadcastReceiver();
+        mInternetIntentFilter = new IntentFilter();
+        mInternetBroadcastReceiver = new InternetBroadcastReceiver();
 
-        mInternetIntenFilter.addAction(Intent.ACTION_MANAGE_NETWORK_USAGE);
+        mInternetIntentFilter.addAction(Intent.ACTION_MANAGE_NETWORK_USAGE);
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2, RecyclerView.VERTICAL, false);
 
@@ -83,27 +88,52 @@ public class MainActivity extends AppCompatActivity {
 
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        //default movie catalog will be in sort order of popular
-        loadMovieData(NetworkUtils.POPULAR);
+        Log.v(TAG, "savedInstance is "+ savedInstanceState);
+
+        if (savedInstanceState != null && savedInstanceState.getString(SORT_KEY) !=null){
+            sort = savedInstanceState.getString(SORT_KEY);
+
+            Log.v(TAG, "sort is "+ sort);
+            if(!sort.equals(getResources().getString(R.string.favorites))){
+                loadMovieData(sort);
+            }
+            else {
+                Log.v(TAG, "SORT IS "+sort);
+                loadFavourites();
+            }
+
+        }
+        else {
+
+            //default movie catalog will be in sort order of popular
+            loadMovieData(NetworkUtils.POPULAR);
+        }
     }
+
+    @Override
+    public void onSaveInstanceState(@NotNull Bundle outState) {
+        outState.putString(SORT_KEY,sort);
+        super.onSaveInstanceState(outState);
+    }
+
 
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mInternetBroadcastReciever,mInternetIntenFilter);
-        if(!networkIsAvailable){
-            mErrorMessageTv.setText(R.string.no_internet_connection);
-            showErrorMessage();
-        }
-        else {
-            mErrorMessageTv.setText(R.string.error_message);
-        }
+        registerReceiver(mInternetBroadcastReceiver, mInternetIntentFilter);
+//        if(!networkIsAvailable){
+//            mErrorMessageTv.setText(R.string.no_internet_connection);
+//            showErrorMessage();
+//        }
+//        else {
+//            mErrorMessageTv.setText(R.string.error_message);
+        //}
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mInternetBroadcastReciever);
+        unregisterReceiver(mInternetBroadcastReceiver);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -152,7 +182,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void loadMovieData(String sort) {
+        if(sort.equals(NetworkUtils.POPULAR)){
+            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.most_popular);
+        }
+        else Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.rating);
             showMovieCatalog();
             new FetchMoviesTask().execute(sort);
         }
@@ -169,21 +204,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void loadFavourites(){
+
+        if(sortingCategory != 0) return;
+
         showMovieCatalog();
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.favorites);
+
         mainViewModel.getFavouriteMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(List<Movie> movies) {
-                if(sortingCategory != 0) return;
 
-                ArrayList<Movie> movieArrayList = (ArrayList<Movie>) movies;
+                ArrayList<Movie> fav = (ArrayList) movies;
 
-                if (movieArrayList != null && movieArrayList.size()!=0) {
-                    mMovieAdapter.setMovieData(movieArrayList);
+                if (fav != null && fav.size()!=0) {
+                    mMovieAdapter.setMovieData(fav);
                 }
                 else showFavouriteErrorMessage();
             }
         });
+
+
+
     }
 
     private void showFavouriteErrorMessage() {
@@ -199,13 +244,14 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.sort_by_rating) {
             sortingCategory = 1;
-            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.rating);
+            sort = NetworkUtils.RATING;
             mMovieAdapter.setMovieData(null);
 
             loadMovieData(NetworkUtils.RATING);
@@ -213,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if (itemId == R.id.sort_by_popular) {
             sortingCategory =1;
-            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.most_popular);
+            sort = NetworkUtils.POPULAR;
 
             mMovieAdapter.setMovieData(null);
 
@@ -222,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(itemId == R.id.sort_by_favourites){
             sortingCategory = 0;
-            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.favorites);
+            sort = getResources().getString(R.string.favorites);
 
             mMovieAdapter.setMovieData(null);
             loadFavourites();
