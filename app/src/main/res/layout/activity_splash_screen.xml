@@ -7,7 +7,6 @@
     tools:context=".SplashScreenActivity"
     android:background="@color/colorPrimaryDark">
     <TextView
-        android:id="@+id/textView"
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

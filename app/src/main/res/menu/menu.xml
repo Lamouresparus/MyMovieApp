@@ -4,8 +4,7 @@
     <item
         app:showAsAction="collapseActionView"
         android:orderInCategory="1"
-        android:title="@string/sort_by"
-        android:id="@+id/sort">
+        android:title="@string/sort_by">
         <menu>
             <item
                 android:id="@+id/sort_by_popular"
