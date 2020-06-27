@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private IntentFilter mInternetIntentFilter;
     private String sort;
     private static final String SORT_KEY = "sort key";
+    ArrayList<Movie> fav;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -99,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
             }
             else {
                 Log.v(TAG, "SORT IS "+sort);
+                sortingCategory = 0;
                 loadFavourites();
             }
 
@@ -218,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Movie> movies) {
 
-                ArrayList<Movie> fav = (ArrayList) movies;
+                fav = (ArrayList) movies;
 
                 if (fav != null && fav.size()!=0) {
                     mMovieAdapter.setMovieData(fav);
